@@ -3,7 +3,7 @@
 #   _CLOUDSDK_COMPUTE_ZONE
 #   _CLOUDSDK_CONTAINER_CLUSTER
 #   _GITHUB_USERNAME
-#   _KMS_KEY 
+#   _KMS_KEY
 #   _KMS_KEYRING
 #
 
@@ -16,20 +16,18 @@ steps:
       - 'gcr.io/${PROJECT_ID}/pipeline:${COMMIT_SHA}'
       - '.'
 
-  # Retrieve and decrypt the GitHub Hub configuration. 
+  # Retrieve and decrypt the GitHub Hub configuration.
   - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'sh'
+    args: ['cp', 'gs://${PROJECT_ID}-pipeline-configs/hub.enc', 'hub.enc']
+  - name: 'gcr.io/cloud-builders/gcloud'
     args:
-      - '-c'
-      - |
-        gsutil cp gs://${PROJECT_ID}-pipeline-configs/hub.enc hub.enc
-
-        gcloud kms decrypt \
-          --ciphertext-file hub.enc \
-          --plaintext-file /config/hub \
-          --location global \
-          --keyring ${_KMS_KEYRING} \
-          --key ${_KMS_KEY}
+      - kms
+      - decrypt
+      - --ciphertext-file=hub.enc
+      - --plaintext-file=/config/hub
+      - --location=global
+      - --keyring=${_KMS_KEYRING}
+      - --key=${_KMS_KEY}
     volumes:
       - name: 'config'
         path: /config
@@ -47,7 +45,7 @@ steps:
         CLUSTER=$$(gcloud config get-value container/cluster)
         PROJECT=$$(gcloud config get-value core/project)
         ZONE=$$(gcloud config get-value compute/zone)
-      
+
         gcloud container clusters get-credentials "$${CLUSTER}" \
           --project "$${PROJECT}" \
           --zone "$${ZONE}"
@@ -66,7 +64,7 @@ steps:
       - |
         ACTIVE_ACCOUNT=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
 
-        hub config --global credential.https://github.com.helper /usr/local/bin/hub-credential-helper 
+        hub config --global credential.https://github.com.helper /usr/local/bin/hub-credential-helper
         hub config --global hub.protocol https
         hub config --global user.email "$${ACTIVE_ACCOUNT}"
         hub config --global user.name "Google Container Builder"
@@ -92,7 +90,7 @@ steps:
         mv pipeline.yaml kubernetes/deployments/pipeline.yaml
 
         hub add kubernetes/deployments/pipeline.yaml
-              
+
         hub commit -F- <<EOF
         Update the pipeline-application
 
