@@ -50,7 +50,7 @@ steps:
       
         gcloud container clusters get-credentials "$${CLUSTER}" \
           --project "$${PROJECT}" \
-          --zone "$${ZONE}"
+          --zone=asia-east1-a
     volumes:
       - name: 'kube'
         path: /kube
