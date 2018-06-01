@@ -13,3 +13,4 @@ gunicorn = "*"
 
 [dev-packages]
 
+pylint = "*"
