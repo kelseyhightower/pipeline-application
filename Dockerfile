@@ -1,8 +1,8 @@
-FROM golang:1.9.2
-WORKDIR /go/src/github.com/kelseyhightower/app/
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build .
-
-FROM scratch
-COPY --from=0 /go/src/github.com/kelseyhightower/app/app .
-ENTRYPOINT ["/app"]
+FROM python:3
+COPY Pipfile* /app/
+EXPOSE 8000
+WORKDIR /app
+RUN pip install pipenv flake8 gunicorn
+RUN pipenv install --system --dev
+COPY . /app
+ENTRYPOINT ["gunicorn", "hello:app", "-b", "0.0.0.0:80"]
