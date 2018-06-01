@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.6-alpine
 COPY Pipfile* /app/
 EXPOSE 8000
 WORKDIR /app
