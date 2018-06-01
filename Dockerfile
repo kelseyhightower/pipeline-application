@@ -5,4 +5,4 @@ WORKDIR /app
 RUN pip install pipenv flake8 gunicorn
 RUN pipenv install --system --dev
 COPY . /app
-ENTRYPOINT ["gunicorn", "hello:app", "-b", "0.0.0.0:8000"]
+ENTRYPOINT ["gunicorn", "hello:app", "-b", "0.0.0.0:80"]
