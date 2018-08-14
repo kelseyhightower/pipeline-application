@@ -54,6 +54,12 @@ steps:
     volumes:
       - name: 'kube'
         path: /kube
+        
+  # Push the new image to GCR before deploying it.
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/${PROJECT_ID}/pipeline:${COMMIT_SHA}'
 
   # Clone the pipeline-infrastructure-staging repo.
   - name: 'gcr.io/hightowerlabs/hub'
@@ -109,6 +115,3 @@ steps:
         path: /config
       - name: 'kube'
         path: /kube
-
-images:
-  - 'gcr.io/${PROJECT_ID}/pipeline:${COMMIT_SHA}'
